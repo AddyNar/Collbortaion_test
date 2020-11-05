@@ -1,15 +1,6 @@
-import tensorflow as tf
 import os
-import random
-import cv2 as cv
-import numpy as np
 import glob
-from tensorflow.keras import datasets, layers, models
-from tensorflow.keras.utils import Sequence
-from tensorflow.keras.applications import ResNet101,ResNet50
-from tensorflow.keras.preprocessing.image import load_img
 import tensorflow.keras.backend as K
-import matplotlib.pyplot as plt
 
 
 def get_image_pair_fnames(base_dir, dstype):
@@ -59,3 +50,17 @@ def get_image_pair_fnames(base_dir, dstype):
         print(len(fname_pairs))
 
     return fname_pairs
+
+
+def iou_coef(y_true, y_pred, smooth=1):
+    intersection = K.sum(K.abs(y_true * y_pred), axis=[1,2,3])
+    union = K.sum(y_true,[1,2,3])+K.sum(y_pred,[1,2,3])-intersection
+    iou = K.mean((intersection + smooth) / (union + smooth), axis=0)
+    return iou
+
+
+def dice_coef(y_true, y_pred, smooth=1):
+    intersection = K.sum(y_true * y_pred, axis=[1,2,3])
+    union = K.sum(y_true, axis=[1,2,3]) + K.sum(y_pred, axis=[1,2,3])
+    dice = K.mean((2. * intersection + smooth)/(union + smooth), axis=0)
+    return dice
