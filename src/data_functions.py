@@ -53,14 +53,36 @@ def get_image_pair_fnames(base_dir, dstype):
 
 
 def iou_coef(y_true, y_pred, smooth=1):
-    intersection = K.sum(K.abs(y_true * y_pred), axis=[1,2,3])
-    union = K.sum(y_true,[1,2,3])+K.sum(y_pred,[1,2,3])-intersection
+    """
+    Take ground truth and prediction mask and return the IoU score.
+
+    Input Arguments:
+    y_true -- The hot-one encoded mask generated from the Label ID's folder
+    y_pred -- The output prediction of the CNN of the same dimensions as y_true
+    smooth -- The smoothness value of the computation; default = 1
+
+    Returns:
+    iou -- The IoU score
+    """
+    intersection = K.sum(K.abs(y_true * y_pred), axis=[1, 2, 3])
+    union = K.sum(y_true, [1, 2, 3])+K.sum(y_pred, [1, 2, 3])-intersection
     iou = K.mean((intersection + smooth) / (union + smooth), axis=0)
     return iou
 
 
 def dice_coef(y_true, y_pred, smooth=1):
-    intersection = K.sum(y_true * y_pred, axis=[1,2,3])
-    union = K.sum(y_true, axis=[1,2,3]) + K.sum(y_pred, axis=[1,2,3])
+    """
+    Take ground truth and prediction mask and return the dice coefficient.
+
+    Input Arguments:
+    y_true -- The hot-one encoded mask generated from the Label ID's folder
+    y_pred -- The output prediction of the CNN of the same dimensions as y_true
+    smooth -- The smoothness value of the computation; default = 1
+
+    Returns:
+    dice -- The Dice Coefficient
+    """
+    intersection = K.sum(y_true * y_pred, axis=[1, 2, 3])
+    union = K.sum(y_true, axis=[1, 2, 3]) + K.sum(y_pred, axis=[1, 2, 3])
     dice = K.mean((2. * intersection + smooth)/(union + smooth), axis=0)
     return dice
